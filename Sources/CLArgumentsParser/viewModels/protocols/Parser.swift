@@ -9,7 +9,7 @@ public protocol ParserProtocol {
 public extension ParserProtocol {
     func parse(_ args: [String]) throws -> [RegistryType.Command] {
         var commands: [RegistryType.Command] = []
-        var index = 1
+        var index = 0
 
         while index < args.count {
             if let command = register.getCommand(args[index]) {
