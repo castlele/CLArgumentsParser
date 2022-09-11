@@ -10,7 +10,7 @@ let package = Package(
     targets: [
         .target(
             name: "CLArgumentsParser",
-            dependencies: ["CLArgumentsParser"]),
+            dependencies: []),
         .testTarget(
             name: "CLArgumentsParserTests",
             dependencies: ["CLArgumentsParser"]),
