@@ -7,13 +7,10 @@ let package = Package(
     products: [
         .library(name: "CLArgumentsParser", targets: ["CLArgumentsParser"]),
     ],
-    dependencies: [
-        .package(url: "git@github.com:castlele/CLArgumentsParser.git", .branch("master")),
-    ],
     targets: [
         .target(
             name: "CLArgumentsParser",
-            dependencies: []),
+            dependencies: ["CLArgumentsParser"]),
         .testTarget(
             name: "CLArgumentsParserTests",
             dependencies: ["CLArgumentsParser"]),
