@@ -29,7 +29,9 @@ public extension ParserProtocol {
 
         while index < args.count, register.getCommand(args[index]) == nil {
             if let option = register.getOption(args[index]) {
-                command.add(option: option)
+                guard command.add(option: option) else {
+                    throw CLParserError.optionUseOfOption(option: option.stringValue, command: command.name)
+                }
             } else {
                 command.add(argument: args[index])
             }

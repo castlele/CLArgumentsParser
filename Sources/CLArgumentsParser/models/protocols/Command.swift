@@ -11,17 +11,26 @@ public protocol CommandProtocol {
     var type: CommandType { get set }
     var arguments: [String] { get set }
     var options: [Option] { get set }
+    var availableOptions: [String: Option] { get }
 
-    mutating func add(option: Option)
-    mutating func add(argument: String)
+    @discardableResult mutating func add(option: Option) -> Bool
+
+    @discardableResult mutating func add(argument: String) -> Bool
 }
 
 public extension CommandProtocol {
-    mutating func add(option: Option) {
-        options.append(option)
+    @discardableResult
+    mutating func add(option: Option) -> Bool {
+        if let _ = availableOptions[option.stringValue] {
+            options.append(option)
+            return true
+        }
+        return false
     }
 
-    mutating func add(argument: String) {
+    @discardableResult
+    mutating func add(argument: String) -> Bool {
         arguments.append(argument)
+        return true
     }
 }
