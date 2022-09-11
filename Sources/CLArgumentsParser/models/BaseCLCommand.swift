@@ -1,6 +1,6 @@
-public struct BaseCLCommand: CommandProtocol {
+public struct BaseCLCommand<Option: OptionType>: CommandProtocol {
     public var name: String
     public var type: CommandType
     public var arguments: [String]
-    public var options: [BaseCLOption]
+    public var options: [Option]
 }
