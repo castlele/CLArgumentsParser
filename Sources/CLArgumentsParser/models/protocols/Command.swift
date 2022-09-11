@@ -1,5 +1,5 @@
 public protocol CommandType {
-    var argumentsNeeded: Int { get }
+    var argumentsNeeded: (min: Int, max: Int) { get }
 }
 
 public typealias OptionType = StringRepresentable & Hashable

@@ -37,7 +37,8 @@ public extension ParserProtocol {
             index += 1
         }
 
-        guard command.type.argumentsNeeded == command.arguments.count else {
+        guard command.type.argumentsNeeded.min >= command.arguments.count,
+              command.type.argumentsNeeded.max <= command.arguments.count else {
             throw CLParserError.invalidUsage(command: command.name)
         }
 
