@@ -1,5 +1,8 @@
 public protocol CommandProtocol: ArgumentsHolder, OptionsHolder {
+    associatedtype CommandType
+
     var name: String { get set }
+    var type: CommandType { get set }
 }
 
 public extension CommandProtocol {
