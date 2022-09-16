@@ -29,8 +29,10 @@ public extension ParserProtocol {
 
         while index < args.count, register.getCommand(args[index]) == nil {
             if let option = register.getOption(args[index]) {
+                let option = try parse(option, fromIndex: &index, args: args)
+
                 guard command.add(option: option) else {
-                    throw CLParserError.optionUseOfOption(option: option.stringValue, command: command.name)
+                    throw CLParserError.invalidUseOfOption(option: option.stringValue, command: command.name)
                 }
             } else {
                 command.add(argument: args[index])
@@ -39,11 +41,30 @@ public extension ParserProtocol {
             index += 1
         }
 
-        guard command.type.argumentsNeeded.min <= command.arguments.count,
-              command.type.argumentsNeeded.max >= command.arguments.count else {
+        guard command.isValid() else {
             throw CLParserError.invalidUsage(command: command.name)
         }
 
         return command
+    }
+
+    private func parse(_ option: RegistryType.Command.Option,
+                       fromIndex index: inout Int,
+                       args: [String]) throws -> RegistryType.Command.Option {
+
+        var option = option
+
+        while index < args.count,
+              register.getOption(args[index]) == nil,
+              register.getCommand(args[index]) == nil {
+        
+            option.add(argument: args[index])
+        }
+
+        guard option.isValid() else {
+            throw CLParserError.invalidUsage(option: option.stringValue)
+        }
+
+        return option
     }
 }

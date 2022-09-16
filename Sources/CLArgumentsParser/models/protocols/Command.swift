@@ -1,24 +1,23 @@
-public protocol CommandType {
-    var argumentsNeeded: (min: Int, max: Int) { get }
+public protocol CommandProtocol: ArgumentsHolder, OptionsHolder {
+    var name: String { get set }
 }
 
-public typealias OptionType = StringRepresentable & Hashable
+public extension CommandProtocol {
+}
 
-public protocol CommandProtocol {
+public protocol OptionType: ArgumentsHolder, StringRepresentable, Hashable {
+}
+
+public protocol OptionsHolder {
     associatedtype Option: OptionType
 
-    var name: String { get set }
-    var type: CommandType { get set }
-    var arguments: [String] { get set }
     var options: [Option] { get set }
     var availableOptions: [String: Option] { get }
 
     @discardableResult mutating func add(option: Option) -> Bool
-
-    @discardableResult mutating func add(argument: String) -> Bool
 }
 
-public extension CommandProtocol {
+public extension OptionsHolder {
     @discardableResult
     mutating func add(option: Option) -> Bool {
         if let _ = availableOptions[option.stringValue] {
@@ -27,10 +26,24 @@ public extension CommandProtocol {
         }
         return false
     }
+}
 
+public protocol ArgumentsHolder {
+    var arguments: [String] { get set }
+    var argumentsNeeded: (min: Int, max: Int) { get }
+
+    @discardableResult mutating func add(argument: String) -> Bool
+    func isValid() -> Bool
+}
+
+public extension ArgumentsHolder {
     @discardableResult
     mutating func add(argument: String) -> Bool {
         arguments.append(argument)
         return true
+    }
+
+    func isValid() -> Bool {
+        return argumentsNeeded.min <= arguments.count && argumentsNeeded.max >= arguments.count
     }
 }
