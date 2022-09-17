@@ -47,6 +47,6 @@ public extension ArgumentsHolder {
     }
 
     func isValid() -> Bool {
-        return argumentsNeeded.min <= arguments.count && argumentsNeeded.max >= arguments.count
+        argumentsNeeded.min <= arguments.count && argumentsNeeded.max >= arguments.count
     }
 }
