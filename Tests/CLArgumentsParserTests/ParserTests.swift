@@ -1,69 +1,69 @@
-import XCTest
 import CLArgumentsParser
+import XCTest
 
 final class CLArgumentsParserTests: XCTestCase {
 
-    private typealias CLCommand = BaseCLCommand<CLOption, CLCommandType>
-    private typealias CLRegister = BaseCLRegister<CLCommand>
-
-    private struct CLOption: OptionType {
-        public static let optName = CLOption(type: .optName)
-
-        public enum CLOptionType {
-            case optName
-        }
-
-        public var type: CLOptionType
-        public var arguments: [String] = []
-        public var argumentsNeeded: (min: Int, max: Int) { (0, 1) }
-
-        public var stringValue: String {
-            "opt_name"
-        }
-    }
-
-    private enum CLCommandType {
-        case appName, cmdName
-    }
-
-    private let registry = CLRegister()
-    private lazy var parser = BaseCLParser<CLRegister>(register: registry)
+    var parser: BaseCLParser<BaseCLRegister<MockCommand>>?
+    var registry: BaseCLRegister<MockCommand>?
 
     override func setUp() {
         super.setUp()
 
-        let appCommand = CLCommand(name: "app_name",       
-                                   type: .appName,         
-                                   arguments: [],
-                                   argumentsNeeded: (0, 1),         
-                                   options: [],                     
-                                   availableOptions: [:])             
+        registry = .init()
+        register()
 
-        let cmd = CLCommand(name: "cmd_name",       
-                            type: .cmdName,         
-                            arguments: [],
-                            argumentsNeeded: (0, 1),         
-                            options: [],                     
-                            availableOptions: [CLOption.optName.stringValue: .optName])             
-
-        let option = CLOption.optName
-
-        registry.register(command: appCommand)
-        registry.register(command: cmd)
-        registry.register(option: option)
+        parser = .init(register: registry!)
     }
 
-    func testParsing() throws {
-        let args = [
-            "app_name",
-            "cmd_name",
-            "arg_1",
-            "opt_name",
-            "arg_2",
-        ]
+    override func tearDown() {
+        super.tearDown()
 
-        let cmds = try? parser.parse(args)
+        registry = nil
+        parser = nil
+    }
 
-        XCTAssert(cmds != nil)
+    func testValidArgumentsParsing() throws {
+        let args = ["main", "help"]
+        let args1 = ["main", "1", "help"]
+        let args2 = ["main", "1", "2", "help"]
+        let args3 = ["main", "1", "2", "help", "main", "help"]
+        
+        let command = MockCommand(name: "main",
+                                  type: .main,
+                                  argumentsNeeded: (0, 2),
+                                  options: [.help],
+                                  availableOptions: ["help": .help])
+        let command1 = MockCommand(name: "main",
+                                   type: .main,
+                                   arguments: ["1", "2"],
+                                   argumentsNeeded: (0, 2),
+                                   options: [.help],
+                                   availableOptions: ["help": .help])
+
+        XCTAssertNoThrow(try parser?.parse(args))
+        XCTAssertNoThrow(try parser?.parse(args1))
+        XCTAssertNoThrow(try parser?.parse(args2))
+        XCTAssertNoThrow(try parser?.parse(args3))
+
+        XCTAssertEqual(try parser?.parse(args), [command])
+        XCTAssertEqual(try parser?.parse(args2), [command1])
+        XCTAssertEqual(try parser?.parse(args3), [command1, command])
+    }
+
+    func testInvalidArgumentsParsing() throws {
+    }
+
+    private func register() {
+        guard let registry = registry else { return }
+
+        let mainCommand = MockCommand(name: "main",
+                                      type: .main,
+                                      argumentsNeeded: (0, 2),
+                                      availableOptions: ["help": .help])
+
+        let option = MockOption.help
+
+        registry.register(command: mainCommand)
+        registry.register(option: option)
     }
 }

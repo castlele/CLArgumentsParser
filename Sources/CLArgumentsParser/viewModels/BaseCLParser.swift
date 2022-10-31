@@ -1,3 +1,4 @@
+/// Base parser object.
 open class BaseCLParser<RegistryType: RegistryProtocol>: ParserProtocol {
 
     public var register: RegistryType

@@ -1,8 +1,15 @@
+/// Represents object, that parses arguments from command line.
 public protocol ParserProtocol {
     associatedtype RegistryType: RegistryProtocol
 
+    /// An object that holds all registered commands and options.
     var register: RegistryType { get set }
 
+    /// Parses a given array of strings into array of commands.
+    ///
+    /// - Parameter args: Command line arguments.
+    /// - Returns: Array of commands. To parse commands `register`should hold all of the necessary arguments and options.
+    /// - Throws: `CLDefaultParserError`
     func parse(_ args: [String]) throws -> [RegistryType.Command]
 }
 
@@ -17,7 +24,7 @@ public extension ParserProtocol {
                 try commands.append(parse(command, fromIndex: &index, args: args))
                 
             } else {
-                throw CLParserError.invalidArgument(argument: args[index])
+                throw CLDefaultParserError.invalidArgument(argument: args[index])
             }
         }
 
@@ -34,7 +41,7 @@ public extension ParserProtocol {
 
                 guard command.add(option: option) else {
 
-                    throw CLParserError.invalidUseOfOption(option: option.stringValue, command: command.name)
+                    throw CLDefaultParserError.invalidUseOfOption(option: option.stringValue, command: command.name)
                 }
             } else {
                 command.add(argument: args[index])
@@ -43,7 +50,7 @@ public extension ParserProtocol {
         }
 
         guard command.isValid() else {
-            throw CLParserError.invalidUsage(command: command.name)
+            throw CLDefaultParserError.invalidUsage(command: command.name)
         }
 
         return command
@@ -64,7 +71,7 @@ public extension ParserProtocol {
         }
 
         guard option.isValid() else {
-            throw CLParserError.invalidUsage(option: option.stringValue)
+            throw CLDefaultParserError.invalidUsage(option: option.stringValue)
         }
 
         return option
